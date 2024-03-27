@@ -18,12 +18,16 @@ app.use(
 );
 
 app.use("/customer/auth/*", function auth(req, res, next) {
-  //Write the authenication mechanism here
-  if (req.session.user) {
+  // Write the authentication mechanism here
+  const token = req.session.token;
+  const username = req.session.username;
+  jwt.verify(token, "fingerprint_customer", (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    req.username = username;
     next();
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
+  });
 });
 
 const PORT = 5000;
